@@ -1,0 +1,83 @@
+# Build outputs
+**/bin/
+**/obj/
+**/publish/
+**/out/
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Visual Studio and VS Code
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs and runtime artifacts
+Logs/
+logs/
+*.log
+*.txt    # (if you want; or prefer Logs/*.txt only)
+**/Logs/**
+
+# Runtime / temp files
+*.pid
+*.pid.lock
+*.pidfile
+*.tmp
+
+# Test results / coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+
+# Local DB files (sqlite, mdf)
+*.mdf
+*.ldf
+*.sqlite
+*.db
+
+# NuGet packages / generated package files
+*.nupkg
+packages/
+project.lock.json
+
+# User secrets / credentials (do NOT track)
+appsettings.secrets.json
+**/appsettings.*.secrets.json
+.env
+.env.* 
+*.pem
+*.pfx
+*.key
+secrets.json
+
+# Docker / publish artifacts
+docker-compose.override.yml
+docker-compose.*.yml
+**/docker-compose.override.yml
+**/docker-compose.*.yml
+**/docker-compose.override.*
+
+# Editor temp files / OS files
+*.DS_Store
+Thumbs.db
+
+# Azure / azd / local azd state
+.azure/
+.azd/
+
+# Generated migration or tooling caches (if any)
+*.dbschema
+*.sqlite3
+
+# Optional: publish output (if you produce it locally)
+**/publish/
+
+# Optional: exclude large test fixtures or local dumps
+**/dump.sql

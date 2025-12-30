@@ -1,0 +1,35 @@
+{
+  "packages": {
+    "AbpRegionMap.RegionMappingService": {
+      "path": "AbpRegionMap.RegionMappingService/AbpRegionMap.RegionMappingService.abppkg"
+    },
+    "AbpRegionMap.RegionMappingService.Tests": {
+      "path": "AbpRegionMap.RegionMappingService.Tests/AbpRegionMap.RegionMappingService.Tests.abppkg"
+    },
+    "AbpRegionMap.RegionMappingService.Contracts": {
+      "path": "AbpRegionMap.RegionMappingService.Contracts/AbpRegionMap.RegionMappingService.Contracts.abppkg"
+    }
+  },
+  "imports": {
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.BlobStoring.Database": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.LanguageManagement": {
+      "version": "9.3.2",
+      "isInstalled": true
+    }
+  }
+}

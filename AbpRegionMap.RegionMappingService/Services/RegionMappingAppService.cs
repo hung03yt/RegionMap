@@ -216,10 +216,32 @@ public class RegionMappingAppService : ApplicationService, IRegionMappingAppServ
         if (string.IsNullOrWhiteSpace(nameNorm))
             return null;
 
-        // lookup, no alias
+        //lookup, no alias, normalized vs name_norm
+        if (parentId.HasValue)
+        {
+            var sqlWithParent = @"
+                SELECT id FROM cores_units_old
+                WHERE level::text = @Level AND parent_id = @ParentId AND name_norm = @Name AND is_deleted::text IN ('0','f','false')
+                LIMIT 1
+            ";
+            var id = await connection.QueryFirstOrDefaultAsync<long?>(sqlWithParent, new { Level = level, ParentId = parentId.Value, Name = nameNorm });
+            if (id.HasValue) return id;
+        }
+        else
+        {
+            var sqlNoParent = @"
+                SELECT id FROM cores_units_old
+                WHERE level::text = @Level AND name_norm = @Name AND is_deleted::text IN ('0','f','false')
+                LIMIT 1
+            ";
+            var id = await connection.QueryFirstOrDefaultAsync<long?>(sqlNoParent, new { Level = level, Name = nameNorm });
+            if (id.HasValue) return id;
+        }
+
+        // lookup, no alias, normalized core vs name_core_norm
         var candidates = new List<string> { nameNorm };
         // common administrative prefixes in normalized form
-        var prefixes = new[] { "quan", "huyen", "thi xa", "thi tran", "phuong", "xa" , "thanh pho", "tp", "tp." };
+        var prefixes = new[] { "quan", "huyen", "thi xa", "thi tran", "phuong", "xa" , "thanh pho", "tp", "tp.", "tinh" };
         foreach (var p in prefixes)
         {
             if (nameNorm.StartsWith(p + " ", StringComparison.Ordinal))
@@ -234,7 +256,7 @@ public class RegionMappingAppService : ApplicationService, IRegionMappingAppServ
         {
             var sqlWithParent = @"
                 SELECT id FROM cores_units_old
-                WHERE level::text = @Level AND parent_id = @ParentId AND name_norm = @Name AND is_deleted::text IN ('0','f','false')
+                WHERE level::text = @Level AND parent_id = @ParentId AND name_core_norm = @Name AND is_deleted::text IN ('0','f','false')
                 LIMIT 1
             ";
             foreach (var candidate in candidates)
@@ -247,7 +269,7 @@ public class RegionMappingAppService : ApplicationService, IRegionMappingAppServ
         {
             var sqlNoParent = @"
                 SELECT id FROM cores_units_old
-                WHERE level::text = @Level AND name_norm = @Name AND is_deleted::text IN ('0','f','false')
+                WHERE level::text = @Level AND name_core_norm = @Name AND is_deleted::text IN ('0','f','false')
                 LIMIT 1
             ";
             foreach (var candidate in candidates)
@@ -261,16 +283,16 @@ public class RegionMappingAppService : ApplicationService, IRegionMappingAppServ
         if (parentId.HasValue)
         {
             var aliasSqlWithParent = @"
-                    SELECT a.unit_id FROM cores_units_old_alias a
-                    JOIN cores_units_old u ON u.id = a.unit_id
-                    WHERE a.alias_norm = @Name
-                        AND a.is_active::text IN ('1','t','true')
-                        AND a.is_deleted::text IN ('0','f','false')
-                        AND u.level::text = @Level
-                        AND u.parent_id = @ParentId
-                        AND u.is_deleted::text IN ('0','f','false')
-                    ORDER BY a.priority
-                    LIMIT 1
+                SELECT a.unit_id FROM cores_units_old_alias a
+                JOIN cores_units_old u ON u.id = a.unit_id
+                WHERE a.alias_norm = @Name
+                    AND a.is_active::text IN ('1','t','true')
+                    AND a.is_deleted::text IN ('0','f','false')
+                    AND u.level::text = @Level
+                    AND u.parent_id = @ParentId
+                    AND u.is_deleted::text IN ('0','f','false')
+                ORDER BY a.priority
+                LIMIT 1
             ";
             foreach (var candidate in candidates)
             {
@@ -280,17 +302,17 @@ public class RegionMappingAppService : ApplicationService, IRegionMappingAppServ
         }
         else
         {
-                        var aliasSqlNoParent = @"
-                                SELECT a.unit_id FROM cores_units_old_alias a
-                                JOIN cores_units_old u ON u.id = a.unit_id
-                                WHERE a.alias_norm = @Name
-                                    AND a.is_active::text IN ('1','t','true')
-                                    AND a.is_deleted::text IN ('0','f','false')
-                                    AND u.level::text = @Level
-                                    AND u.is_deleted::text IN ('0','f','false')
-                                ORDER BY a.priority
-                                LIMIT 1
-                        ";
+            var aliasSqlNoParent = @"
+                SELECT a.unit_id FROM cores_units_old_alias a
+                JOIN cores_units_old u ON u.id = a.unit_id
+                WHERE a.alias_norm = @Name
+                    AND a.is_active::text IN ('1','t','true')
+                    AND a.is_deleted::text IN ('0','f','false')
+                    AND u.level::text = @Level
+                    AND u.is_deleted::text IN ('0','f','false')
+                ORDER BY a.priority
+                LIMIT 1
+            ";
             foreach (var candidate in candidates)
             {
                 var aliasId = await connection.QueryFirstOrDefaultAsync<long?>(aliasSqlNoParent, new { Name = candidate, Level = level });
